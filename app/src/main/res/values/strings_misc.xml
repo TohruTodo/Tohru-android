@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="archive_restore">Khôi phục</string>
+    <string name="archive_delete_forever">Xóa vĩnh viễn</string>
+    <string name="archive_title">Kho lưu trữ</string>
+    <string name="archive_empty_title">Kho lưu trữ trống</string>
+    <string name="archive_empty_hint">Mục đã lưu trữ sẽ xuất hiện ở đây</string>
+    <string name="archive_delete_title">Xóa vĩnh viễn?</string>
+    <string name="archive_delete_message">%1$d mục sẽ bị xóa khỏi kho lưu trữ và không thể hoàn tác.</string>
+    <string name="archive_delete_confirm">Xóa</string>
+    <string name="archive_selected_title">Đã chọn %1$d</string>
+    <string name="archive_mark_undone">Bỏ đánh dấu xong</string>
+    <string name="archive_mark_done">Đánh dấu xong</string>
+    <string name="archive_copy_selected">Sao chép mục đã chọn</string>
+    <string name="archive_more_actions">Thêm thao tác</string>
+    <string name="archive_select_all">Chọn tất cả</string>
+    <string name="archive_clear_selection">Bỏ chọn tất cả</string>
+
+    <string name="overlay_error_task_file">Không xử lý được tệp nhiệm vụ.</string>
+    <string name="overlay_error_read">Không đọc được dữ liệu nhiệm vụ.</string>
+    <string name="overlay_loading">Đang tải…</string>
+    <string name="overlay_task_missing">Không tìm thấy task.</string>
+    <string name="overlay_empty">Chưa có nhiệm vụ nào ở đây</string>
+    <string name="overlay_add_task">Thêm nhiệm vụ</string>
+    <string name="overlay_title">Nhiệm vụ</string>
+    <string name="overlay_close">Đóng</string>
+    <string name="overlay_task_name">Tên nhiệm vụ</string>
+    <string name="overlay_task_description">Mô tả</string>
+    <string name="overlay_notification_channel">Nhiệm vụ nhanh</string>
+    <string name="overlay_notification_title">Nhiệm vụ nhanh</string>
+    <string name="overlay_notification_text">Đang mở trên màn hình</string>
+
+    <string name="quick_overlay_title">Hiển thị nhiệm vụ trên ứng dụng khác</string>
+    <string name="quick_overlay_body">Tohru cần quyền hiển thị trên ứng dụng khác để mở màn hình nhiệm vụ nổi, kể cả khi app chính không mở.</string>
+    <string name="quick_overlay_grant">Cấp quyền</string>
+    <string name="quick_overlay_later">Để sau</string>
+</resources>

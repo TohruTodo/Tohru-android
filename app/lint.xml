@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- adaptive-icon is only read from the v26 qualifier. -->
+    <issue id="ObsoleteSdkInt" severity="ignore" />
+    <!-- JGit ships an opt-in trust-all socket factory for http.sslVerify=false;
+         the app never disables TLS verification. -->
+    <issue id="TrustAllX509TrustManager" severity="ignore" />
+</lint>

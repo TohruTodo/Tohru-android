@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="git_title">Git</string>
+    <string name="git_status_syncing">Đang đồng bộ…</string>
+    <string name="git_status_error">Lỗi Git</string>
+    <plurals name="git_status_conflicts">
+        <item quantity="other">%1$d tệp xung đột</item>
+    </plurals>
+    <plurals name="git_status_dirty">
+        <item quantity="other">%1$d thay đổi chưa commit</item>
+    </plurals>
+    <plurals name="git_status_unpushed">
+        <item quantity="other">%1$d commit chưa push</item>
+    </plurals>
+    <string name="git_status_diverged">Lệch: %1$d chưa đẩy, %2$d chưa kéo</string>
+    <plurals name="git_status_ahead">
+        <item quantity="other">%1$d commit chưa đẩy</item>
+    </plurals>
+    <plurals name="git_status_behind">
+        <item quantity="other">%1$d commit chưa kéo</item>
+    </plurals>
+    <string name="git_status_synced">Đã đồng bộ</string>
+    <string name="git_status_no_remote">Chưa cấu hình remote</string>
+    <string name="git_status_line">\u0020\u0020● %1$s</string>
+    <string name="git_upstream">→ %1$s</string>
+    <string name="git_change_branch">Đổi branch</string>
+    <string name="git_local_changes">Thay đổi local</string>
+    <string name="git_action_commit">Commit</string>
+    <string name="git_action_fetch">Fetch</string>
+    <string name="git_action_pull">Pull</string>
+    <string name="git_action_push">Push</string>
+    <string name="git_resolve_conflicts">Giải quyết xung đột</string>
+    <string name="git_history">Lịch sử</string>
+    <string name="git_export_zip">Xuất ZIP</string>
+    <string name="git_import_zip">Nhập ZIP</string>
+    <string name="git_open_settings">Mở cài đặt</string>
+    <string name="git_action_sync">Đồng bộ</string>
+    <string name="git_commit_dialog_title">Commit local</string>
+    <string name="git_commit_message_label">Commit message</string>
+    <string name="git_commit_default_message">chore(tasks): update %1$s</string>
+    <string name="git_commit_scope_one">%1$d file</string>
+    <string name="git_commit_scope_many">%1$d files</string>
+    <string name="git_cancel">Huỷ</string>
+    <string name="git_continue">Tiếp tục</string>
+    <string name="git_conflict_title">Xung đột</string>
+    <plurals name="git_conflict_summary">
+        <item quantity="other">%1$d file cần chọn bản giữ lại hoặc sửa tay.</item>
+    </plurals>
+    <string name="git_conflict_discard_title">Huỷ xung đột?</string>
+    <string name="git_conflict_discard_text">Thay đổi từ remote sẽ không được áp dụng. Bản local vẫn giữ nguyên.</string>
+    <string name="git_conflict_discard_confirm">Huỷ đồng bộ</string>
+    <string name="git_conflict_back">Quay lại</string>
+    <string name="git_conflict_local">Bản máy này</string>
+    <string name="git_conflict_remote">Bản từ remote</string>
+    <string name="git_conflict_deleted_suffix">%1$s (đã xoá)</string>
+    <string name="git_conflict_line_count">%1$d dòng</string>
+    <string name="git_conflict_custom">Đã sửa tay (%1$d dòng).</string>
+    <string name="git_conflict_show_diff">Xem khác biệt</string>
+    <string name="git_conflict_hide_diff">Ẩn khác biệt</string>
+    <string name="git_conflict_edit">Sửa</string>
+    <string name="git_conflict_no_diff">Không có khác biệt về nội dung.</string>
+    <string name="git_conflict_editor_title">Sửa xung đột</string>
+    <string name="git_conflict_editor_placeholder">Nội dung markdown của task</string>
+    <string name="git_dirty_count_total">%1$d</string>
+    <string name="git_dirty_count_filtered">%1$d/%2$d</string>
+    <string name="git_dirty_empty">Không có thay đổi local.</string>
+    <string name="git_dirty_no_result">Không tìm thấy tệp.</string>
+    <string name="git_dirty_kind_modified">Sửa</string>
+    <string name="git_dirty_kind_added">Thêm</string>
+    <string name="git_dirty_kind_removed">Xoá</string>
+    <string name="git_dirty_kind_untracked">Mới</string>
+    <string name="git_dirty_kind_moved">Chuyển</string>
+    <string name="git_dirty_kind_conflicting">Xung đột</string>
+    <string name="git_task_title">Nhiệm vụ</string>
+    <string name="git_task_insert_link">Chèn link task</string>
+    <string name="git_task_archive">Lưu trữ</string>
+    <string name="git_task_toc">Mục lục</string>
+    <string name="git_task_loading">Đang tải…</string>
+    <string name="git_task_pick_title">Chọn nhiệm vụ</string>
+    <string name="git_task_pick_empty">Không tìm thấy task</string>
+    <string name="git_task_meta">%1$s | %2$d ký tự</string>
+    <string name="git_history_title">Lịch sử Git</string>
+    <string name="git_history_filter_all">Tất cả</string>
+    <string name="git_history_filter_branch">Nhánh</string>
+    <string name="git_history_empty">Chưa có commit nào.</string>
+    <string name="git_history_error">Không đọc được lịch sử Git.</string>
+    <string name="git_history_commit_error">Không đọc được commit.</string>
+    <string name="git_history_diff_error">Không đọc được diff.</string>
+    <string name="git_history_parent">Parent: %1$s</string>
+    <string name="git_history_stat">+%1$d −%2$d</string>
+    <string name="git_history_no_diff">Không có diff văn bản.</string>
+    <string name="git_view_all">Xem tất cả</string>
+    <string name="git_changes_new">%1$d mới</string>
+</resources>

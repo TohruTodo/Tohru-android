@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">Language</string>
+    <string name="language_system">System</string>
+    <string name="language_vietnamese">Vietnamese</string>
+    <string name="language_english">English</string>
+
+    <string name="sync_error_not_configured">Git remote is not configured.</string>
+    <string name="sync_error_ssh_key_missing">SSH remotes require a private key; tokens only work with HTTPS.</string>
+    <string name="sync_error_no_pending_conflict">No conflicts are pending.</string>
+    <string name="sync_error_invalid_conflict_content">The edited content is not valid for a task.</string>
+    <string name="sync_error_no_commit">There is nothing to push.</string>
+    <string name="sync_error_dirty_worktree">There are uncommitted changes. Commit them first.</string>
+    <string name="sync_error_push_rejected">The remote has new changes. Sync again.</string>
+    <string name="sync_error_merge_failed">Could not merge the remote changes.</string>
+    <string name="sync_error_remote_not_found">Remote or repository not found.</string>
+    <string name="sync_error_host_unreachable">Remote host not found.</string>
+    <string name="sync_error_connection_failed">Could not connect to the remote.</string>
+    <string name="sync_error_tls_failed">Could not establish a secure connection.</string>
+    <string name="sync_error_transport_failed">Could not connect to the remote.</string>
+    <string name="sync_error_unknown">The sync operation could not be completed.</string>
+
+</resources>

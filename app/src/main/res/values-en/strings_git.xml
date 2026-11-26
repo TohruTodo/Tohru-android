@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="git_title">Git</string>
+    <string name="git_status_syncing">Syncing…</string>
+    <string name="git_status_error">Git error</string>
+    <plurals name="git_status_conflicts">
+        <item quantity="one">%1$d conflicting file</item>
+        <item quantity="other">%1$d conflicting files</item>
+    </plurals>
+    <plurals name="git_status_dirty">
+        <item quantity="one">%1$d uncommitted change</item>
+        <item quantity="other">%1$d uncommitted changes</item>
+    </plurals>
+    <plurals name="git_status_unpushed">
+        <item quantity="one">%1$d unpushed commit</item>
+        <item quantity="other">%1$d unpushed commits</item>
+    </plurals>
+    <string name="git_status_diverged">Diverged: %1$d to push, %2$d to pull</string>
+    <plurals name="git_status_ahead">
+        <item quantity="one">%1$d commit to push</item>
+        <item quantity="other">%1$d commits to push</item>
+    </plurals>
+    <plurals name="git_status_behind">
+        <item quantity="one">%1$d commit to pull</item>
+        <item quantity="other">%1$d commits to pull</item>
+    </plurals>
+    <string name="git_status_synced">Synced</string>
+    <string name="git_status_no_remote">No remote configured</string>
+    <string name="git_status_line">\u0020\u0020● %1$s</string>
+    <string name="git_upstream">→ %1$s</string>
+    <string name="git_change_branch">Change branch</string>
+    <string name="git_local_changes">Local changes</string>
+    <string name="git_action_commit">Commit</string>
+    <string name="git_action_fetch">Fetch</string>
+    <string name="git_action_pull">Pull</string>
+    <string name="git_action_push">Push</string>
+    <string name="git_resolve_conflicts">Resolve conflicts</string>
+    <string name="git_history">History</string>
+    <string name="git_export_zip">Export ZIP</string>
+    <string name="git_import_zip">Import ZIP</string>
+    <string name="git_open_settings">Open settings</string>
+    <string name="git_action_sync">Sync</string>
+    <string name="git_commit_dialog_title">Commit locally</string>
+    <string name="git_commit_message_label">Commit message</string>
+    <string name="git_commit_default_message">chore(tasks): update %1$s</string>
+    <string name="git_commit_scope_one">%1$d file</string>
+    <string name="git_commit_scope_many">%1$d files</string>
+    <string name="git_cancel">Cancel</string>
+    <string name="git_continue">Continue</string>
+    <string name="git_conflict_title">Conflict</string>
+    <plurals name="git_conflict_summary">
+        <item quantity="one">%1$d file needs a side chosen or a manual edit.</item>
+        <item quantity="other">%1$d files need a side chosen or a manual edit.</item>
+    </plurals>
+    <string name="git_conflict_discard_title">Discard conflict?</string>
+    <string name="git_conflict_discard_text">Remote changes will not be applied. The local copy stays as is.</string>
+    <string name="git_conflict_discard_confirm">Discard sync</string>
+    <string name="git_conflict_back">Back</string>
+    <string name="git_conflict_local">This device</string>
+    <string name="git_conflict_remote">Remote</string>
+    <string name="git_conflict_deleted_suffix">%1$s (deleted)</string>
+    <string name="git_conflict_line_count">%1$d lines</string>
+    <string name="git_conflict_custom">Edited manually (%1$d lines).</string>
+    <string name="git_conflict_show_diff">Show diff</string>
+    <string name="git_conflict_hide_diff">Hide diff</string>
+    <string name="git_conflict_edit">Edit</string>
+    <string name="git_conflict_no_diff">No content differences.</string>
+    <string name="git_conflict_editor_title">Edit conflict</string>
+    <string name="git_conflict_editor_placeholder">Task markdown body</string>
+    <string name="git_dirty_count_total">%1$d</string>
+    <string name="git_dirty_count_filtered">%1$d/%2$d</string>
+    <string name="git_dirty_empty">No local changes.</string>
+    <string name="git_dirty_no_result">No files found.</string>
+    <string name="git_dirty_kind_modified">Modified</string>
+    <string name="git_dirty_kind_added">Added</string>
+    <string name="git_dirty_kind_removed">Deleted</string>
+    <string name="git_dirty_kind_untracked">New</string>
+    <string name="git_dirty_kind_moved">Moved</string>
+    <string name="git_dirty_kind_conflicting">Conflicting</string>
+    <string name="git_task_title">Task</string>
+    <string name="git_task_insert_link">Insert task link</string>
+    <string name="git_task_archive">Archive</string>
+    <string name="git_task_toc">Contents</string>
+    <string name="git_task_loading">Loading…</string>
+    <string name="git_task_pick_title">Choose a task</string>
+    <string name="git_task_pick_empty">No tasks found</string>
+    <string name="git_task_meta">%1$s | %2$d characters</string>
+    <string name="git_history_title">Git history</string>
+    <string name="git_history_filter_all">All</string>
+    <string name="git_history_filter_branch">Branch</string>
+    <string name="git_history_empty">No commits yet.</string>
+    <string name="git_history_error">Could not read Git history.</string>
+    <string name="git_history_commit_error">Could not read the commit.</string>
+    <string name="git_history_diff_error">Could not read the diff.</string>
+    <string name="git_history_parent">Parent: %1$s</string>
+    <string name="git_history_stat">+%1$d −%2$d</string>
+    <string name="git_history_no_diff">No text diff.</string>
+    <string name="git_view_all">View all</string>
+    <string name="git_changes_new">%1$d new</string>
+</resources>

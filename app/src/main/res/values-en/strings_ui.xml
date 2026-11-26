@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_back">Back</string>
+    <string name="ui_sync_git">Sync Git</string>
+    <string name="ui_quick_add_hint">group(topic): task to do</string>
+    <string name="ui_description_markdown">Description (markdown)</string>
+    <string name="ui_add">Add</string>
+    <string name="ui_title_label">Title</string>
+    <string name="ui_edit_detail">Edit details</string>
+    <string name="ui_no_text">No text</string>
+    <string name="ui_more_options">More options</string>
+    <string name="ui_select_all">Select all</string>
+    <string name="ui_cut">Cut</string>
+    <string name="ui_copy">Copy</string>
+    <string name="ui_paste">Paste</string>
+    <string name="ui_quick_tile_label">Quick task</string>
+    <string name="ui_conflict_invalid_frontmatter">Invalid task frontmatter.</string>
+    <string name="ui_conflict_id_mismatch">Frontmatter id does not match the file name.</string>
+    <string name="ui_detail_date_pattern">MMM d, HH:mm</string>
+    <string name="ui_done">Done</string>
+</resources>
