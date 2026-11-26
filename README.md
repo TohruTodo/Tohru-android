@@ -1,14 +1,16 @@
+<div align="center">
+
 # Tohru
 
 [English](README.md) · [Tiếng Việt](README.vi.md)
 
-Tohru is a task manager for Android. Every task is a Markdown file in a Git
-repository that you own. The app has no account, no server, and no proprietary
-sync service.
+A task management app that prioritizes simplicity, speed, and data ownership.
 
 [![CI](https://github.com/TohruTodo/Tohru-android/actions/workflows/ci.yml/badge.svg)](https://github.com/TohruTodo/Tohru-android/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/TohruTodo/Tohru-android)](https://github.com/TohruTodo/Tohru-android/releases)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
+
+</div>
 
 ## Install
 
@@ -216,6 +218,11 @@ CI reads `KEYSTORE_PATH`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and
 Version metadata comes from Git. `versionName` follows the nearest tag and
 `versionCode` tracks the commit count. The release workflow runs on `v*` tags
 and publishes the APK with `SHA256SUMS`.
+
+## Documentation
+
+Product philosophy and development guidelines live in
+[Tohru Docs](https://github.com/TohruTodo/Tohru-docs).
 
 ## Contributing
 

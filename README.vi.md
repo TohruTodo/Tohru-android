@@ -1,14 +1,16 @@
+<div align="center">
+
 # Tohru
 
 [English](README.md) · [Tiếng Việt](README.vi.md)
 
-Tohru là trình quản lý nhiệm vụ cho Android. Mỗi nhiệm vụ là một tệp Markdown
-trong kho Git do bạn sở hữu. Ứng dụng không có tài khoản, không có máy chủ và
-không dùng dịch vụ đồng bộ riêng.
+Ứng dụng quản lý nhiệm vụ ưu tiên sự đơn giản, tốc độ và quyền sở hữu dữ liệu.
 
 [![CI](https://github.com/TohruTodo/Tohru-android/actions/workflows/ci.yml/badge.svg)](https://github.com/TohruTodo/Tohru-android/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/TohruTodo/Tohru-android)](https://github.com/TohruTodo/Tohru-android/releases)
 [![License](https://img.shields.io/badge/license-GPL--3.0--or--later-blue.svg)](LICENSE)
+
+</div>
 
 ## Cài đặt
 
@@ -220,6 +222,11 @@ secret trong kho mã nguồn.
 Thông tin phiên bản lấy từ Git. `versionName` theo tag gần nhất và `versionCode`
 theo số commit. Workflow release chạy khi push tag `v*` và xuất bản APK kèm
 `SHA256SUMS`.
+
+## Tài liệu
+
+Triết lý sản phẩm và hướng dẫn phát triển nằm trong
+[Tohru Docs](https://github.com/TohruTodo/Tohru-docs).
 
 ## Đóng góp
 
