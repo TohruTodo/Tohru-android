@@ -279,13 +279,7 @@ private fun OverlayTaskContent(
                         initial = editing,
                         onDone = { title, body, done ->
                             val base = editing
-                            val unchanged = base != null &&
-                                !TaskEditor.needsSave(base, title, body) &&
-                                base.done == done
-                            if (unchanged) {
-                                composerOpen = false
-                                editing = null
-                            } else {
+                            if (TaskEditor.shouldSave(base, title, body, done)) {
                                 val task = if (base != null) {
                                     base.copy(title = title.trim(), body = body, done = done)
                                 } else {
@@ -301,6 +295,9 @@ private fun OverlayTaskContent(
                                     composerOpen = false
                                     editing = null
                                 }
+                            } else {
+                                composerOpen = false
+                                editing = null
                             }
                         },
                     )
@@ -440,7 +437,6 @@ private fun TaskComposer(
                 horizontalArrangement = Arrangement.End,
             ) {
                 TextButton(
-                    enabled = title.isNotBlank(),
                     onClick = { onDone(title, body, done) },
                 ) {
                     Text(stringResource(R.string.ui_done), color = MaterialTheme.colorScheme.primary)
