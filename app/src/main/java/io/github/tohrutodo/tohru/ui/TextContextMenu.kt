@@ -2,8 +2,9 @@ package io.github.tohrutodo.tohru.ui
 
 import androidx.compose.ui.res.stringResource
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,13 +32,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
@@ -56,11 +59,18 @@ class AppTextContextMenuState {
     internal var entry by mutableStateOf<Entry?>(null)
         private set
 
+    // Set while a touch gesture that closed the menu is still in progress, so
+    // the text field cannot immediately request its toolbar again.
+    internal var suppressReopen: Boolean = false
+
     val provider: TextContextMenuProvider = object : TextContextMenuProvider {
         override suspend fun showTextContextMenu(dataProvider: TextContextMenuDataProvider) {
+            if (suppressReopen) return
             val id = Any()
             val close = CompletableDeferred<Unit>()
+            val previous = entry
             entry = Entry(id, dataProvider, close)
+            previous?.close?.complete(Unit)
             try {
                 close.await()
             } finally {
@@ -70,8 +80,9 @@ class AppTextContextMenuState {
     }
 
     fun dismiss() {
-        entry?.close?.complete(Unit)
+        val current = entry ?: return
         entry = null
+        current.close.complete(Unit)
     }
 
     internal data class Entry(
@@ -97,7 +108,29 @@ fun AppTextContextMenuHost(
                 .fillMaxSize()
                 .onGloballyPositioned { anchor = it },
         ) {
-            content()
+            // The handler sits above the content instead of in a scrim so the
+            // same press also reaches the text field, which clears the
+            // selection and hides its own toolbar.
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(state) {
+                        awaitEachGesture {
+                            awaitFirstDown(
+                                requireUnconsumed = false,
+                                pass = PointerEventPass.Initial,
+                            )
+                            if (state.entry != null) {
+                                state.dismiss()
+                                state.suppressReopen = true
+                            } else {
+                                state.suppressReopen = false
+                            }
+                        }
+                    },
+            ) {
+                content()
+            }
             val entry = state.entry
             val coordinates = anchor
             if (entry != null && coordinates != null) {
@@ -134,12 +167,6 @@ private fun AppTextMenu(
     }
 
     BackHandler { dismiss() }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Transparent)
-            .clickable(indication = null, interactionSource = null) { dismiss() },
-    )
     var overflowOpen by remember { mutableStateOf(false) }
     val session = remember(entry) {
         object : TextContextMenuSession {
@@ -164,14 +191,16 @@ private fun AppTextMenu(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 primary.forEach { item ->
-                    MenuIcon(item, session, dismiss)
+                    key(item.key) { MenuIcon(item, session) }
                 }
                 if (extras.isNotEmpty()) {
-                    IconButton(onClick = { overflowOpen = !overflowOpen }) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_more_horiz),
-                            contentDescription = stringResource(R.string.ui_more_options),
-                        )
+                    key(OVERFLOW_KEY) {
+                        IconButton(onClick = { overflowOpen = !overflowOpen }) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_more_horiz),
+                                contentDescription = stringResource(R.string.ui_more_options),
+                            )
+                        }
                     }
                 }
             }
@@ -185,35 +214,36 @@ private fun AppTextMenu(
             ) {
                 Column(modifier = Modifier.padding(vertical = 4.dp)) {
                     extras.forEachIndexed { index, item ->
-                        if (index > 0) {
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.outlineVariant,
-                                modifier = Modifier.padding(horizontal = 12.dp),
-                            )
-                        }
-                        Row(
-                            modifier = Modifier
-                                .clickable {
-                                    item.onClick(session)
-                                    dismiss()
-                                }
-                                .padding(horizontal = 16.dp, vertical = 12.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            val resources = LocalResources.current
-                            val hasIcon = item.leadingIcon != 0 && remember(item.leadingIcon, resources) {
-                                runCatching { resources.getDrawable(item.leadingIcon, null) != null }
-                                    .getOrDefault(false)
-                            }
-                            if (hasIcon) {
-                                Icon(
-                                    painter = painterResource(item.leadingIcon),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp),
+                        key(item.key) {
+                            if (index > 0) {
+                                HorizontalDivider(
+                                    color = MaterialTheme.colorScheme.outlineVariant,
+                                    modifier = Modifier.padding(horizontal = 12.dp),
                                 )
                             }
-                            Text(text = item.label, style = MaterialTheme.typography.bodyMedium)
+                            Row(
+                                modifier = Modifier
+                                    .clickable {
+                                        item.onClick(session)
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                val resources = LocalResources.current
+                                val hasIcon = item.leadingIcon != 0 && remember(item.leadingIcon, resources) {
+                                    runCatching { resources.getDrawable(item.leadingIcon, null) != null }
+                                        .getOrDefault(false)
+                                }
+                                if (hasIcon) {
+                                    Icon(
+                                        painter = painterResource(item.leadingIcon),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp),
+                                    )
+                                }
+                                Text(text = item.label, style = MaterialTheme.typography.bodyMedium)
+                            }
                         }
                     }
                 }
@@ -226,11 +256,10 @@ private fun AppTextMenu(
 private fun MenuIcon(
     item: TextContextMenuItem,
     session: TextContextMenuSession,
-    dismiss: () -> Unit,
 ) {
     val icon = PRIMARY_ICONS[item.key]
     if (icon == null) {
-        IconButton(onClick = { item.onClick(session); dismiss() }) {
+        IconButton(onClick = { item.onClick(session) }) {
             Icon(
                 painter = painterResource(R.drawable.ic_more_horiz),
                 contentDescription = item.label,
@@ -238,7 +267,7 @@ private fun MenuIcon(
         }
         return
     }
-    IconButton(onClick = { item.onClick(session); dismiss() }) {
+    IconButton(onClick = { item.onClick(session) }) {
         Icon(
             painter = painterResource(icon.first),
             contentDescription = stringResource(icon.second),
@@ -267,6 +296,8 @@ private val PRIMARY_ORDER = listOf(
 )
 
 private val PRIMARY_KEYS = PRIMARY_ORDER.toSet()
+
+private const val OVERFLOW_KEY = "menu-overflow"
 
 private val PRIMARY_ICONS = mapOf(
     TextContextMenuKeys.SelectAllKey to (R.drawable.ic_select_all to R.string.ui_select_all),
