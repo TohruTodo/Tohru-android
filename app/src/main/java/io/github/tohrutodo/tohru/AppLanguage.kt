@@ -52,6 +52,21 @@ object AppLocale {
                 language.tag?.let { LocaleList.forLanguageTags(it) } ?: LocaleList.getEmptyLocaleList()
         }
     }
+
+    // Android 13+ stores per-app locales in the system, outside the app data.
+    // A restored backup or an older install can leave an explicit locale while
+    // the app preference says "system", so the preference wins on every start.
+    fun sync(context: Context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val manager = context.getSystemService(LocaleManager::class.java) ?: return
+        val language = AppLanguage.fromPrefs(context.getSharedPreferences(PREFS, Context.MODE_PRIVATE))
+        if (!needsOverride(manager.applicationLocales.toLanguageTags(), language)) return
+        manager.applicationLocales = language.tag?.let { LocaleList.forLanguageTags(it) }
+            ?: LocaleList.getEmptyLocaleList()
+    }
+
+    internal fun needsOverride(currentTags: String, language: AppLanguage): Boolean =
+        currentTags != language.tag.orEmpty()
 }
 
 fun Context.findActivity(): Activity? =

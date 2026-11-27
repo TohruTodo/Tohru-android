@@ -38,6 +38,7 @@ class TohruApp : Application() {
         super.onCreate()
         Diagnostics.install(this)
         prefs = getSharedPreferences("settings", MODE_PRIVATE)
+        AppLocale.sync(this)
         vault = KeystoreVault(this)
         prompter = SyncPrompter()
         _collapsed.value = prefs.getStringSet("collapsed", emptySet())?.toSet().orEmpty()

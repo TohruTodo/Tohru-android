@@ -1,6 +1,8 @@
 package io.github.tohrutodo.tohru
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class AppLanguageTest {
@@ -20,5 +22,14 @@ class AppLanguageTest {
         assertEquals(null, AppLanguage.SYSTEM.tag)
         assertEquals("vi", AppLanguage.VIETNAMESE.tag)
         assertEquals("en", AppLanguage.ENGLISH.tag)
+    }
+
+    @Test fun storedLanguageOverridesOnlyWhenItDiffers() {
+        assertFalse(AppLocale.needsOverride("", AppLanguage.SYSTEM))
+        assertTrue(AppLocale.needsOverride("en", AppLanguage.SYSTEM))
+        assertFalse(AppLocale.needsOverride("vi", AppLanguage.VIETNAMESE))
+        assertTrue(AppLocale.needsOverride("", AppLanguage.ENGLISH))
+        assertTrue(AppLocale.needsOverride("vi", AppLanguage.ENGLISH))
+        assertFalse(AppLocale.needsOverride("en", AppLanguage.ENGLISH))
     }
 }
