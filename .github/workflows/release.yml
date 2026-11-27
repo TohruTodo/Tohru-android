@@ -85,11 +85,21 @@ jobs:
             tohru-*.apk
             SHA256SUMS
 
+      - name: Read tag message
+        if: github.event_name == 'push'
+        run: |
+          git for-each-ref "refs/tags/$GITHUB_REF_NAME" \
+            --format='%(contents:body)' > "$RUNNER_TEMP/release-notes.md"
+          if [ ! -s "$RUNNER_TEMP/release-notes.md" ]; then
+            echo "::warning::Tag $GITHUB_REF_NAME has no release note body"
+          fi
+
       - name: Publish release
         if: github.event_name == 'push'
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
+          body_path: ${{ runner.temp }}/release-notes.md
           files: |
             tohru-*.apk
             SHA256SUMS
