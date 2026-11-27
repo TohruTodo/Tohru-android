@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -219,7 +220,10 @@ fun GitPanel(
             lastSyncLabel?.let {
                 Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 TextButton(
                     onClick = onCommit,
                     enabled = !busy &&
@@ -242,7 +246,10 @@ fun GitPanel(
             if (state.conflicts.isNotEmpty()) {
                 TextButton(onClick = onResolve, enabled = !busy) { Text(stringResource(R.string.git_resolve_conflicts)) }
             }
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
                 TextButton(onClick = onHistory) { Text(stringResource(R.string.git_history)) }
                 TextButton(onClick = onExport, enabled = !busy) { Text(stringResource(R.string.git_export_zip)) }
                 TextButton(onClick = onImport, enabled = !busy) { Text(stringResource(R.string.git_import_zip)) }
