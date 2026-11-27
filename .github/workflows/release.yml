@@ -72,8 +72,10 @@ jobs:
 
       - name: Collect artifacts
         run: |
-          cp app/build/outputs/apk/release/app-release.apk "tohru-${VERSION_NAME}.apk"
-          sha256sum tohru-*.apk > SHA256SUMS
+          apk="$(find app/build/outputs/apk/release -maxdepth 1 -name 'tohru-*.apk' -print -quit)"
+          test -n "$apk"
+          cp "$apk" .
+          sha256sum "$(basename "$apk")" > SHA256SUMS
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7

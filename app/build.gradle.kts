@@ -23,6 +23,9 @@ val appVersionName = System.getenv("VERSION_NAME")?.takeIf(String::isNotBlank)
 val appVersionCode = System.getenv("VERSION_CODE")?.toIntOrNull()
     ?: gitOutput("rev-list", "--count", "HEAD")?.toIntOrNull()?.coerceAtLeast(1)
     ?: 1
+// Release files use tohru-<versionName>-<versionCode>-universal.apk. Replace
+// the '+' in the dev versionName so the name stays file- and URL-safe.
+val releaseApkName = "tohru-${appVersionName.replace('+', '_')}-$appVersionCode-universal.apk"
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 val keystoreProperties = Properties().apply {
@@ -104,6 +107,14 @@ configure<com.android.build.api.dsl.ApplicationExtension> {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+configure<com.android.build.api.variant.ApplicationAndroidComponentsExtension> {
+    onVariants(selector().withBuildType("release")) { variant ->
+        variant.outputs.forEach { output ->
+            output.outputFileName.set(releaseApkName)
+        }
     }
 }
 
