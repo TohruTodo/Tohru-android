@@ -355,6 +355,14 @@ fun TaskCardRow(
                     }
                 }
             }
+            if (task.body.isNotBlank()) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_body),
+                    contentDescription = stringResource(R.string.ui_has_body),
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             if (editMode && showDragHandle) dragHandle()
         }
     }

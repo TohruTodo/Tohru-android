@@ -7,6 +7,7 @@
     <string name="ui_add">Add</string>
     <string name="ui_title_label">Title</string>
     <string name="ui_edit_detail">Edit details</string>
+    <string name="ui_has_body">Has description</string>
     <string name="ui_no_text">No text</string>
     <string name="ui_more_options">More options</string>
     <string name="ui_select_all">Select all</string>
