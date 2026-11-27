@@ -2,7 +2,6 @@ package io.github.tohrutodo.tohru.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,13 +31,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -370,69 +365,32 @@ private fun FileRow(file: GitFileChange, onClick: () -> Unit) {
     }
 }
 
-internal enum class DiffLineKind { Added, Removed, Hunk, Header, Context }
-
-internal fun diffLineKind(line: String): DiffLineKind = when {
-    line.startsWith("+++") || line.startsWith("---") -> DiffLineKind.Header
-    line.startsWith("@@") -> DiffLineKind.Hunk
-    line.startsWith("diff ") ||
-        line.startsWith("index ") ||
-        line.startsWith("new file") ||
-        line.startsWith("deleted file") ||
-        line.startsWith("similarity ") ||
-        line.startsWith("rename ") -> DiffLineKind.Header
-    line.startsWith("+") -> DiffLineKind.Added
-    line.startsWith("-") -> DiffLineKind.Removed
-    else -> DiffLineKind.Context
-}
-
 @Composable
 private fun DiffScreen(title: String, text: String, onBack: () -> Unit) {
-    val added = MaterialTheme.colorScheme.tertiary
-    val addedBackground = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.18f)
-    val removed = MaterialTheme.colorScheme.error
-    val removedBackground = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.22f)
-    val hunk = MaterialTheme.colorScheme.primary
-    val header = MaterialTheme.colorScheme.onSurfaceVariant
-    val context = MaterialTheme.colorScheme.onSurface
-    val rendered = remember(text, added, removed, hunk, header, context) {
-        buildAnnotatedString {
-            val lines = text.lines()
-            lines.forEachIndexed { index, line ->
-                val kind = diffLineKind(line)
-                val color = when (kind) {
-                    DiffLineKind.Added -> added
-                    DiffLineKind.Removed -> removed
-                    DiffLineKind.Hunk -> hunk
-                    DiffLineKind.Header -> header
-                    DiffLineKind.Context -> context
-                }
-                val background = when (kind) {
-                    DiffLineKind.Added -> addedBackground
-                    DiffLineKind.Removed -> removedBackground
-                    else -> Color.Transparent
-                }
-                pushStyle(SpanStyle(color = color, background = background))
-                append(line)
-                pop()
-                if (index < lines.lastIndex) append('\n')
-            }
-        }
+    val colors = rememberDiffColors()
+    val noDiff = stringResource(R.string.git_history_no_diff)
+    val blank = text.isBlank()
+    val lines = remember(text, noDiff) {
+        if (text.isBlank()) listOf(noDiff) else text.lines()
     }
-    val display = if (text.isBlank()) AnnotatedString(stringResource(R.string.git_history_no_diff)) else rendered
     Scaffold(
         topBar = { TohruTopBar(title = title, onBack = onBack) },
     ) { padding ->
-        Text(
-            text = display,
+        Column(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .horizontalScroll(rememberScrollState())
-                .padding(12.dp),
-            style = MaterialTheme.typography.bodySmall,
-            fontFamily = FontFamily.Monospace,
-        )
+                .padding(vertical = 8.dp),
+        ) {
+            lines.forEach { line ->
+                DiffLine(
+                    text = line,
+                    kind = if (blank) DiffLineKind.Context else diffLineKind(line),
+                    colors = colors,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        }
     }
 }

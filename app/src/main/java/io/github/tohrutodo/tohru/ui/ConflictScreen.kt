@@ -1,7 +1,7 @@
 package io.github.tohrutodo.tohru.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -297,30 +297,38 @@ private fun DiffBox(local: String, remote: String) {
         )
         return
     }
-    Column(
+    val colors = rememberDiffColors()
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(max = 260.dp)
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-            .verticalScroll(rememberScrollState())
-            .padding(8.dp),
+            .heightIn(max = 260.dp),
+        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
-        lines.forEach { line ->
-            val prefix = when (line.kind) {
-                DiffKind.REMOVED -> "- "
-                DiffKind.ADDED -> "+ "
-                DiffKind.CONTEXT -> "  "
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(vertical = 6.dp),
+        ) {
+            lines.forEach { line ->
+                val prefix = when (line.kind) {
+                    DiffKind.REMOVED -> "- "
+                    DiffKind.ADDED -> "+ "
+                    DiffKind.CONTEXT -> "  "
+                }
+                val kind = when (line.kind) {
+                    DiffKind.REMOVED -> DiffLineKind.Removed
+                    DiffKind.ADDED -> DiffLineKind.Added
+                    DiffKind.CONTEXT -> DiffLineKind.Context
+                }
+                DiffLine(
+                    text = prefix + line.text,
+                    kind = kind,
+                    colors = colors,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
-            val color = when (line.kind) {
-                DiffKind.REMOVED -> MaterialTheme.colorScheme.error
-                DiffKind.ADDED -> MaterialTheme.colorScheme.primary
-                DiffKind.CONTEXT -> MaterialTheme.colorScheme.onSurfaceVariant
-            }
-            Text(
-                text = prefix + line.text,
-                style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 12.sp),
-                color = color,
-            )
         }
     }
 }
