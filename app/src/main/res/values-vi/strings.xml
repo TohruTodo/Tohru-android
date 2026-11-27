@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="language_title">Ngôn ngữ</string>
+    <string name="language_system">Hệ thống</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_english">English</string>
+
+    <string name="sync_error_not_configured">Chưa cấu hình git remote.</string>
+    <string name="sync_error_ssh_key_missing">Remote SSH cần khoá riêng, token chỉ dùng cho HTTPS.</string>
+    <string name="sync_error_no_pending_conflict">Không có xung đột đang chờ.</string>
+    <string name="sync_error_invalid_conflict_content">Nội dung sửa không hợp lệ cho một task.</string>
+    <string name="sync_error_no_commit">Chưa có dữ liệu để đẩy.</string>
+    <string name="sync_error_dirty_worktree">Còn thay đổi chưa commit. Hãy commit trước.</string>
+    <string name="sync_error_push_rejected">Remote đã có thay đổi mới, hãy đồng bộ lại.</string>
+    <string name="sync_error_merge_failed">Không trộn được thay đổi từ remote.</string>
+    <string name="sync_error_remote_not_found">Không tìm thấy remote hoặc repository.</string>
+    <string name="sync_error_host_unreachable">Không tìm thấy máy chủ remote.</string>
+    <string name="sync_error_connection_failed">Không kết nối được tới remote.</string>
+    <string name="sync_error_tls_failed">Không thiết lập được kết nối bảo mật.</string>
+    <string name="sync_error_transport_failed">Không kết nối được tới remote.</string>
+    <string name="sync_error_unknown">Không thực hiện được thao tác đồng bộ.</string>
+
+</resources>

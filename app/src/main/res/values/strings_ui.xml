@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="ui_back">Quay lại</string>
-    <string name="ui_sync_git">Đồng bộ Git</string>
-    <string name="ui_quick_add_hint">nhóm(chủ đề): việc cần làm</string>
-    <string name="ui_description_markdown">Mô tả (markdown)</string>
-    <string name="ui_add">Thêm</string>
-    <string name="ui_title_label">Tiêu đề</string>
-    <string name="ui_edit_detail">Sửa chi tiết</string>
-    <string name="ui_no_text">Không có văn bản</string>
-    <string name="ui_more_options">Thêm tuỳ chọn</string>
-    <string name="ui_select_all">Chọn tất cả</string>
-    <string name="ui_cut">Cắt</string>
-    <string name="ui_copy">Sao chép</string>
-    <string name="ui_paste">Dán</string>
-    <string name="ui_quick_tile_label">Nhiệm vụ nhanh</string>
-    <string name="ui_conflict_invalid_frontmatter">Frontmatter task không hợp lệ.</string>
-    <string name="ui_conflict_id_mismatch">id trong frontmatter không khớp tên file.</string>
-    <string name="ui_detail_date_pattern">d \'tháng\' M HH:mm</string>
-    <string name="ui_done">Xong</string>
+    <string name="ui_back">Back</string>
+    <string name="ui_sync_git">Sync Git</string>
+    <string name="ui_quick_add_hint">group(topic): task to do</string>
+    <string name="ui_description_markdown">Description (markdown)</string>
+    <string name="ui_add">Add</string>
+    <string name="ui_title_label">Title</string>
+    <string name="ui_edit_detail">Edit details</string>
+    <string name="ui_no_text">No text</string>
+    <string name="ui_more_options">More options</string>
+    <string name="ui_select_all">Select all</string>
+    <string name="ui_cut">Cut</string>
+    <string name="ui_copy">Copy</string>
+    <string name="ui_paste">Paste</string>
+    <string name="ui_quick_tile_label">Quick task</string>
+    <string name="ui_conflict_invalid_frontmatter">Invalid task frontmatter.</string>
+    <string name="ui_conflict_id_mismatch">Frontmatter id does not match the file name.</string>
+    <string name="ui_detail_date_pattern">MMM d, HH:mm</string>
+    <string name="ui_done">Done</string>
 </resources>
