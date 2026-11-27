@@ -285,6 +285,27 @@ class JGitSyncTest {
         assertTrue(detail!!.files.any { it.path.endsWith("1-0001.md") })
     }
 
+    @Test fun diffKeepsUnicodePaths() = runBlocking {
+        val git = sync(repoA)
+        val task = Task(id = "1-0001", title = "Ghi chú", created = 1_000, updated = 1_000)
+        val relative = "tasks/${TaskFile.fileName(task)}"
+        val file = File(repoA, relative)
+        file.parentFile?.mkdirs()
+        file.writeText(TaskFile.serialize(task))
+        assertSuccess(git.commit("add unicode task"))
+
+        val snapshot = git.snapshot()
+        assertTrue(snapshot.dirtyFiles.isEmpty())
+        val hash = git.history(limit = 1).getOrThrow().first().hash
+        val diff = git.commitDiff(hash, relative).getOrThrow()
+
+        assertTrue("diff should keep the unicode path: $diff", diff.contains(relative))
+        assertFalse("diff should not quote the path: $diff", diff.contains("\\303"))
+        Git.open(repoA).use { opened ->
+            assertEquals("false", opened.repository.config.getString("core", null, "quotePath"))
+        }
+    }
+
     @Test fun snapshotClassifiesDirtyFiles() = runBlocking {
         val git = sync(repoA)
         writeTask(repoA, "1-0001", "one")

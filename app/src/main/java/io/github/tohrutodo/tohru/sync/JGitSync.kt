@@ -541,6 +541,7 @@ class JGitSync(
         val output = ByteArrayOutputStream()
         DiffFormatter(output).use { formatter ->
             formatter.setRepository(repository)
+            formatter.setQuotePaths(false)
             formatter.format(entry)
         }
         return output.toString(UTF_8.name())
@@ -1376,6 +1377,7 @@ class JGitSync(
         }
         updateExcludes()
         Git.open(repoDir).use { git ->
+            keepUnicodePaths(git.repository)
             val pending = readPending()
             val state = git.repository.repositoryState
             when {
@@ -1384,6 +1386,15 @@ class JGitSync(
                 pending != null -> clearPending()
             }
         }
+    }
+
+    // Patches and CLI output quote non-ASCII path bytes by default. The repo
+    // stores names as UTF-8, so disable quoting for this clone.
+    private fun keepUnicodePaths(repository: Repository) {
+        val config = repository.config
+        if (!config.getBoolean("core", null, "quotePath", true)) return
+        config.setBoolean("core", null, "quotePath", false)
+        config.save()
     }
 
     private fun updateExcludes() {
