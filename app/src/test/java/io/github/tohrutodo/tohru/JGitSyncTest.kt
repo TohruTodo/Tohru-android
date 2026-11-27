@@ -306,6 +306,119 @@ class JGitSyncTest {
         }
     }
 
+    @Test fun squashDropsTimestampOnlyRevert() = runBlocking {
+        val git = sync(repoA)
+        val tasks = File(repoA, "tasks").apply { mkdirs() }
+        val file = File(tasks, "1-0001.md")
+        fun write(title: String, updated: Long) {
+            file.writeText(
+                TaskFile.serialize(
+                    Task(id = "1-0001", title = title, created = 1_000, updated = updated),
+                ),
+            )
+        }
+
+        write("one", 1_000)
+        assertSuccess(git.commit("base"))
+        assertSuccess(git.push())
+        val base = Git.open(repoA).use { it.repository.resolve("HEAD")!!.name }
+
+        write("two", 2_000)
+        assertSuccess(git.autoCommit())
+        write("one", 3_000)
+        assertSuccess(git.autoCommit())
+        assertSuccess(git.commit("chore(tasks): sync 1 file"))
+
+        assertEquals(base, Git.open(repoA).use { it.repository.resolve("HEAD")!!.name })
+        val loaded = TaskFile.deserialize(file.readText())
+        assertEquals("one", loaded?.title)
+        assertEquals(1_000L, loaded?.updated)
+    }
+
+    @Test fun commitDropsTimestampOnlyWrite() = runBlocking {
+        val git = sync(repoA)
+        val tasks = File(repoA, "tasks").apply { mkdirs() }
+        val file = File(tasks, "1-0001.md")
+        file.writeText(
+            TaskFile.serialize(Task(id = "1-0001", title = "one", created = 1_000, updated = 1_000)),
+        )
+        assertSuccess(git.commit("base"))
+        assertSuccess(git.push())
+        val base = Git.open(repoA).use { it.repository.resolve("HEAD")!!.name }
+
+        file.writeText(
+            TaskFile.serialize(Task(id = "1-0001", title = "one", created = 1_000, updated = 2_000)),
+        )
+        assertSuccess(git.commit("should be empty"))
+
+        assertEquals(base, Git.open(repoA).use { it.repository.resolve("HEAD")!!.name })
+        assertEquals(1_000L, TaskFile.deserialize(file.readText())?.updated)
+    }
+
+    @Test fun squashKeepsRealChangesAndDropsTimestampOnlyFiles() = runBlocking {
+        val git = sync(repoA)
+        val tasks = File(repoA, "tasks").apply { mkdirs() }
+        fun write(id: String, title: String, updated: Long) {
+            File(tasks, "$id.md").writeText(
+                TaskFile.serialize(Task(id = id, title = title, created = 1_000, updated = updated)),
+            )
+        }
+
+        write("1-0001", "one", 1_000)
+        write("2-0002", "two", 1_000)
+        assertSuccess(git.commit("base"))
+        assertSuccess(git.push())
+        val base = Git.open(repoA).use { it.repository.resolve("HEAD")!!.name }
+
+        write("1-0001", "one-edited", 2_000)
+        assertSuccess(git.autoCommit())
+        write("1-0001", "one", 3_000)
+        assertSuccess(git.autoCommit())
+        write("2-0002", "two-edited", 4_000)
+        assertSuccess(git.autoCommit())
+        assertSuccess(git.commit("chore(tasks): sync 2 files"))
+
+        assertTrue(Git.open(repoA).use { it.repository.resolve("HEAD")!!.name } != base)
+        val reverted = TaskFile.deserialize(File(tasks, "1-0001.md").readText())
+        assertEquals("one", reverted?.title)
+        assertEquals(1_000L, reverted?.updated)
+        val edited = TaskFile.deserialize(File(tasks, "2-0002.md").readText())
+        assertEquals("two-edited", edited?.title)
+        assertEquals(4_000L, edited?.updated)
+        assertTrue(git.snapshot().dirtyFiles.isEmpty())
+    }
+
+    @Test fun pendingIgnoresTimestampOnlyReverts() = runBlocking {
+        val git = sync(repoA)
+        val tasks = File(repoA, "tasks").apply { mkdirs() }
+        fun write(id: String, title: String, updated: Long) {
+            File(tasks, "$id.md").writeText(
+                TaskFile.serialize(Task(id = id, title = title, created = 1_000, updated = updated)),
+            )
+        }
+
+        write("1-0001", "one", 1_000)
+        write("2-0002", "two", 1_000)
+        write("3-0003", "three", 1_000)
+        assertSuccess(git.commit("base"))
+        assertSuccess(git.push())
+
+        write("1-0001", "one-edited", 2_000)
+        assertSuccess(git.autoCommit())
+        write("1-0001", "one", 3_000)
+        assertSuccess(git.autoCommit())
+        write("2-0002", "two", 4_000)
+        assertSuccess(git.autoCommit())
+        val done = File(tasks, "_done").apply { mkdirs() }
+        assertTrue(File(tasks, "3-0003.md").renameTo(File(done, "3-0003.md")))
+        assertSuccess(git.autoCommit())
+
+        val snapshot = git.snapshot()
+
+        assertEquals(1, snapshot.pendingFiles)
+        assertEquals("tasks/_done/3-0003.md", snapshot.pendingFileName)
+    }
+
     @Test fun snapshotClassifiesDirtyFiles() = runBlocking {
         val git = sync(repoA)
         writeTask(repoA, "1-0001", "one")

@@ -365,10 +365,12 @@ fun AppRoot(
             var outcome: String? = null
             try {
                 store.flushWrites()
-                outcome = git.commit(message).fold(
+                val committed = git.commit(message)
+                outcome = committed.fold(
                     onSuccess = { resources.getString(R.string.app_commit_local) },
                     onFailure = { syncFailureMessage(it) },
                 )
+                if (committed.isSuccess) store.refresh()
             } catch (error: kotlinx.coroutines.CancellationException) {
                 throw error
             } catch (error: Throwable) {

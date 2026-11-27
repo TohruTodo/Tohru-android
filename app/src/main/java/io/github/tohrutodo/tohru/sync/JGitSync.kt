@@ -8,6 +8,8 @@ import org.eclipse.jgit.api.CreateBranchCommand
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.diff.DiffEntry
 import org.eclipse.jgit.diff.DiffFormatter
+import org.eclipse.jgit.dircache.DirCache
+import org.eclipse.jgit.dircache.DirCacheEntry
 import org.eclipse.jgit.api.MergeCommand
 import org.eclipse.jgit.api.MergeResult
 import org.eclipse.jgit.api.RebaseCommand
@@ -17,6 +19,7 @@ import org.eclipse.jgit.errors.TransportException
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.CommitBuilder
 import org.eclipse.jgit.lib.ObjectId
+import org.eclipse.jgit.lib.ObjectInserter
 import org.eclipse.jgit.lib.ObjectLoader
 import org.eclipse.jgit.lib.PersonIdent
 import org.eclipse.jgit.lib.RefUpdate
@@ -24,6 +27,7 @@ import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.lib.RepositoryState
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
+import org.eclipse.jgit.revwalk.RevTree
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.revwalk.filter.RevFilter
 import org.eclipse.jgit.transport.CredentialsProvider
@@ -1193,12 +1197,37 @@ class JGitSync(
         git.add().addFilepattern(".").call()
         git.add().setUpdate(true).addFilepattern(".").call()
         if (isClean(git.status().call())) return
+        val repository = git.repository
+        val head = repository.resolve(Constants.HEAD)
+        val headCommit = head?.let { id ->
+            RevWalk(repository).use { walk -> walk.parseCommit(id) }
+        }
         val identity = commitIdentity()
-        git.commit()
-            .setMessage(message)
-            .setAuthor(identity)
-            .setCommitter(identity)
-            .call()
+        val branch = currentBranch(repository) ?: DEFAULT_BRANCH
+        repository.newObjectInserter().use { inserter ->
+            val tree = treeWithReusedBlobs(repository, headCommit?.tree, inserter)
+            if (headCommit != null && tree == headCommit.tree) {
+                git.reset().setMode(ResetCommand.ResetType.HARD).setRef(headCommit.name).call()
+                return
+            }
+            val builder = CommitBuilder().apply {
+                setTreeId(tree)
+                setMessage(message)
+                setAuthor(identity)
+                setCommitter(identity)
+                headCommit?.let { addParentId(it) }
+            }
+            val id = inserter.insert(builder)
+            inserter.flush()
+            val update = repository.updateRef("refs/heads/$branch")
+            update.setNewObjectId(id)
+            update.setForceUpdate(true)
+            val result = update.update()
+            if (result != RefUpdate.Result.FORCED && result != RefUpdate.Result.NEW) {
+                error("cannot update branch after commit")
+            }
+        }
+        git.reset().setMode(ResetCommand.ResetType.HARD).call()
     }
 
     private fun commitWithSquash(git: Git, message: String) {
@@ -1216,9 +1245,8 @@ class JGitSync(
         // Every commit above the upstream is folded into this commit.
         git.add().addFilepattern(".").call()
         git.add().setUpdate(true).addFilepattern(".").call()
-        val index = repository.readDirCache()
         repository.newObjectInserter().use { inserter ->
-            val tree = index.writeTree(inserter)
+            val tree = treeWithReusedBlobs(repository, base.tree, inserter)
             if (tree == base.tree) {
                 // The local commits cancel each other out. Drop them without
                 // creating an empty commit.
@@ -1246,6 +1274,61 @@ class JGitSync(
             git.reset().setMode(ResetCommand.ResetType.HARD).setRef(id.name).call()
         }
     }
+
+    // `updated` is part of the task file, so reverting an edit leaves a diff
+    // that only moves that line. Reuse the reference blob for those files so a
+    // revert cancels out instead of creating a timestamp-only commit.
+    private fun treeWithReusedBlobs(
+        repository: Repository,
+        reference: RevTree?,
+        inserter: ObjectInserter,
+    ): ObjectId {
+        val index = repository.readDirCache()
+        if (reference == null) return index.writeTree(inserter)
+        val target = DirCache.newInCore()
+        val builder = target.builder()
+        for (position in 0 until index.entryCount) {
+            val entry = index.getEntry(position)
+            val path = entry.pathString
+            val referenceId = if (entry.stage == 0 && isTaskFile(path)) {
+                treeBlobId(repository, reference, path)
+            } else {
+                null
+            }
+            if (referenceId != null && referenceId != entry.objectId &&
+                sameTaskContent(repository, entry.objectId, referenceId)
+            ) {
+                val reused = DirCacheEntry(entry)
+                reused.setObjectId(referenceId)
+                builder.add(reused)
+            } else {
+                builder.add(entry)
+            }
+        }
+        builder.finish()
+        return target.writeTree(inserter)
+    }
+
+    private fun sameTaskContent(repository: Repository, first: ObjectId, second: ObjectId): Boolean =
+        runCatching {
+            timestampFreeText(repository.open(first).bytes) ==
+                timestampFreeText(repository.open(second).bytes)
+        }.getOrDefault(false)
+
+    private fun timestampFreeText(bytes: ByteArray): String {
+        val text = String(bytes, UTF_8)
+        val lines = text.lines()
+        if (lines.firstOrNull() != "---") return text
+        val end = lines.drop(1).indexOf("---").let { if (it < 0) return text else it + 1 }
+        return lines
+            .filterIndexed { index, line -> index !in 1 until end || !line.startsWith("updated:") }
+            .joinToString("\n")
+    }
+
+    private fun treeBlobId(repository: Repository, tree: RevTree, path: String): ObjectId? =
+        runCatching {
+            TreeWalk.forPath(repository, path, tree)?.use { walk -> walk.getObjectId(0) }
+        }.getOrNull()
 
     private fun autoCommitWorktree(git: Git) {
         val status = git.status().call()
@@ -1332,7 +1415,22 @@ class JGitSync(
                 add(path, treeTaskId(repository, tree, path))
             }
         }
-        return (otherPaths + taskPaths.values).sorted()
+        val base = unpushedBase(repository)
+        return (otherPaths + taskPaths.values)
+            .filterNot { path -> base != null && onlyTimestampChanged(repository, base, path) }
+            .sorted()
+    }
+
+    // A task that matches the upstream file apart from the updated line is
+    // dropped by the squash, so it does not count as a pending change.
+    private fun onlyTimestampChanged(repository: Repository, base: RevCommit, path: String): Boolean {
+        if (!isTaskFile(path)) return false
+        val baseId = treeBlobId(repository, base.tree, path) ?: return false
+        val file = File(repoDir, path)
+        if (!file.isFile) return false
+        val current = runCatching { file.readBytes() }.getOrNull() ?: return false
+        val previous = runCatching { repository.open(baseId).bytes }.getOrNull() ?: return false
+        return timestampFreeText(current) == timestampFreeText(previous)
     }
 
     private fun treeTaskId(repository: Repository, tree: org.eclipse.jgit.lib.AnyObjectId?, path: String): String? =
